@@ -24,7 +24,15 @@ function showLogin(){
  * La respuesta del CGI es procesada por la función loginResponse
  */
 function doLogin(){
+    const usuario = document.getElementById("usuario").value;
+    const password = document.getElementById("password").value;
+    let url = "http://localhost:8080/cgi-bin/login.pl?usuario="+usuario+"&password="+password;
+    console.log(url);
 
+    xhr = new XMLHttpRequest();
+
+    xhr.open("GET", url, true);
+    xhr.send();
     
 }
 /**
