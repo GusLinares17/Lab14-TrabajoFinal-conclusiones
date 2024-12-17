@@ -5,6 +5,16 @@
  */
 function showLogin(){
 
+    const mainTag = document.getElementById("main");
+
+    var html = `
+    <p>Usuario</p> 
+    <input type='text' id='usuario' name='usuario' required><br>
+    <p>Contraseña</p> 
+    <input type='password' id='password' name='password' required><br>
+    <button style = 'margin-top: 10px' onclick='doLogin()'>Iniciar Sesion</button>`;
+
+    mainTag.innerHTML = html;
 
 }
 
@@ -14,7 +24,18 @@ function showLogin(){
  * La respuesta del CGI es procesada por la función loginResponse
  */
 function doLogin(){
+    const usuario = document.getElementById("usuario").value;
+    const password = document.getElementById("password").value;
+    let url = "http://localhost:8080/cgi-bin/login.pl?usuario="+usuario+"&password="+password;
+    console.log(url);
 
+    xhr = new XMLHttpRequest();
+
+    xhr.open("GET", url, true);
+    xhr.send();
+    xhr.onload = function () { //llamamos a loginResponse
+    loginResponse(xhr.responseXML);
+    };
     
 }
 /**
@@ -26,7 +47,24 @@ function doLogin(){
  * indicando que los datos de usuario y contraseña no coinciden.
  */
 function loginResponse(xml){
+    const userTag = xml.children[0];
+    console.log(userTag);
+if (!(userTag.textContent == "\n")) { 
+        let owner = userTag.children[0].textContent;
+        let firstName = userTag.children[1].textContent;
+        let lastName = userTag.children[2].textContent;
+        
+        userFullName = firstName+" "+ lastName;
+        userKey = owner;
 
+        showLoggedIn();
+       
+    }
+
+    else {// si el valor es vacio, vaciamos formulario
+        document.getElementById("usuario").value = "";
+        document.getElementById("password").value = "";
+    }
    
 
 }
@@ -53,6 +91,21 @@ function showLoggedIn(){
  * función doCreateAccount
  * */
 function showCreateAccount(){
+    const mainTag = document.getElementById("main");
+
+    var html = `
+    <label>Nombres: </label> 
+    <input type='text' id='Nombre' name='Nombre' required><br>
+    <label>Apellidos: </label> 
+    <input type='text' id='Apellido' name='Apellido' required><br>
+    <p>Usuario</p> 
+    <input type='text' id='usuario' name='usuario' required><br>
+    <p>Contraseña</p> 
+    <input type='password' id='password' name='password' required><br>
+    <button style = 'margin-top: 10px' onclick='doCreateAccount()'>Crear cuenta</button>`;
+
+    mainTag.innerHTML = html;
+
 
   
 
