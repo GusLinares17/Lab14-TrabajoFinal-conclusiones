@@ -116,7 +116,11 @@ function showCreateAccount(){
  * la respuesta de este CGI será procesada por loginResponse.
  */
 function doCreateAccount(){
-    
+    // nombre y apellido pueden escribir letras separadas y no habra problema
+    const Nombre = encodeURIComponent(document.getElementById("Nombre").value).replace(/%20/g,"+");
+    const Apellido = encodeURIComponent(document.getElementById("Apellido").value).replace(/%20/g,"+");
+    const usuario = document.getElementById("usuario").value;
+    const password = document.getElementById("password").value;
     
 
 }
