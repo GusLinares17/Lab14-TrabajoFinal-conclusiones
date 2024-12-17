@@ -77,7 +77,8 @@ function showLoggedIn(){
 
     document.getElementById("userName").textContent = userFullName;
     showWelcome();
-    showMenuUserLogged();
+
+     showMenuUserLogged();
   
 
 
