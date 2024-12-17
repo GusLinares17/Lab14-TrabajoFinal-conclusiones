@@ -33,6 +33,9 @@ function doLogin(){
 
     xhr.open("GET", url, true);
     xhr.send();
+    xhr.onload = function () { //llamamos a loginResponse
+    loginResponse(xhr.responseXML);
+    };
     
 }
 /**
