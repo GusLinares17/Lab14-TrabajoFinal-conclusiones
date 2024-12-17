@@ -174,6 +174,17 @@ function doList(){
  * indicándolo.
  */
 function showList(xml){
+    const articlesTag = xml.children[0];
+
+    if (articlesTag.children.length == 0) { // en caso este vacio.
+        document.getElementById("main").innerHTML = <h1>No hay paginas creadas</h1>;
+    } 
+    
+    else {
+        document.getElementById("main").innerHTML = "<h1>Listado de paginas</h1>";
+
+        for (let i = 0; i < articlesTag.children.length; i++) { // imprimimos las paginas existentes
+            //<articles><article><owner><title>
 
    
 
