@@ -5,6 +5,16 @@
  */
 function showLogin(){
 
+    const mainTag = document.getElementById("main");
+
+    var html = `
+    <p>Usuario</p> 
+    <input type='text' id='usuario' name='usuario' required><br>
+    <p>Contraseña</p> 
+    <input type='password' id='password' name='password' required><br>
+    <button style = 'margin-top: 10px' onclick='doLogin()'>Iniciar Sesion</button>`;
+
+    mainTag.innerHTML = html;
 
 }
 
@@ -14,7 +24,18 @@ function showLogin(){
  * La respuesta del CGI es procesada por la función loginResponse
  */
 function doLogin(){
+    const usuario = document.getElementById("usuario").value;
+    const password = document.getElementById("password").value;
+    let url = "http://localhost:8080/cgi-bin/login.pl?usuario="+usuario+"&password="+password;
+    console.log(url);
 
+    xhr = new XMLHttpRequest();
+
+    xhr.open("GET", url, true);
+    xhr.send();
+    xhr.onload = function () { //llamamos a loginResponse
+    loginResponse(xhr.responseXML);
+    };
     
 }
 /**
