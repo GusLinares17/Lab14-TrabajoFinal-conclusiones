@@ -48,7 +48,26 @@ function doLogin(){
  */
 function loginResponse(xml){
 
-   
+   const userTag = xml.children[0];
+    console.log(userTag);
+
+    if (!(userTag.textContent == "\n")) { 
+        let owner = userTag.children[0].textContent;
+        let firstName = userTag.children[1].textContent;
+        let lastName = userTag.children[2].textContent;
+        
+        userFullName = firstName+" "+ lastName;
+        userKey = owner;
+
+        showLoggedIn();
+       
+    }
+
+    else {// si el valor es vacio, vaciamos formulario
+        document.getElementById("usuario").value = "";
+        document.getElementById("password").value = "";
+    }
+
 
 }
 /**
