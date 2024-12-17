@@ -200,9 +200,13 @@ function showList(xml){
  * - Cancelar, que invoca doList
  */
 function showNew(){
-
-    
-
+    let showNew = `<p>Titulo</p>
+    <input id='titulo' name ='titulo' type='text'><br>
+    <p>Contenido-markdown</p>
+    <textarea style = "width: 100%;" type="text" id ="cuerpo" name="cuerpo"></textarea><br>
+    <button onclick='doNew()'>Enviar</button>
+    <button onclick='doList()'>Cancelar</button>`;
+    document.getElementById("main").innerHTML = showNew;
 }
 
 /*
@@ -212,8 +216,17 @@ function showNew(){
  * función responseNew
  */
 function doNew(){
-    
-
+    // encodeURI reemplaza espacios con %20, entonces reemplazamos %20 con + para la url
+    let titulo = encodeURIComponent(document.getElementById("titulo").value).replace(/%20/g, "+"); // para reemplazar espacios en el url
+    let cuerpo = encodeURIComponent(document.getElementById("cuerpo").value).replace(/%20/g,"+");
+    let url = "http://localhost:8080/cgi-bin/new.pl?usuario="+userKey+"&titulo="+titulo+"&cuerpo="+cuerpo;
+    console.log(url);
+    let xhr = new XMLHttpRequest();
+    xhr.open("GET", url, true);
+    xhr.send();
+    xhr.onload = function () {
+        responseNew(xhr.responseXML);
+    };
 }
 
 /*
@@ -222,8 +235,14 @@ function doNew(){
  * correspondiera
  */
 function responseNew(response){
-   
-    
+    //Muestra el nuevo articulo creado
+    let article = response.children[0];
+    if (article.children.length == 0) { //si esta vacio
+        document.getElementById("main").innerHTML = <h2>Error al crear nueva pagina</h2>;
+    } 
+    else {
+        document.getElementById("main").innerHTML = "<h2>"+article.children[0].textContent+"</h2><p>"+article.children[1].textContent+"</p>";
+    }
 }
 
 /*
@@ -231,7 +250,19 @@ function responseNew(response){
  * atendida por responseView
  */
 function doView(owner, title) {
-    
+    let url = http://localhost:8080/cgi-bin/view.pl?usuario=${encodeURIComponent(owner)}&titulo=${encodeURIComponent(title)};
+    let xhr = new XMLHttpRequest();
+    xhr.open("GET", url, true);
+    xhr.send();
+    xhr.onload = function () {
+        if (!xhr.responseXML) {
+            console.error("Error: La respuesta no es XML válido.");
+            console.log("Respuesta recibida:", xhr.responseText);
+            document.getElementById("main").innerHTML = <h2>Error al cargar la página</h2>;
+            return;
+        }
+        responseView(xhr.responseXML);
+    };
 }
 
 
