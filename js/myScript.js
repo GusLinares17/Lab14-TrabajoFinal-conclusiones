@@ -150,7 +150,18 @@ function doCreateAccount(){
  * La respuesta del CGI debe ser procesada por showList
  */
 function doList(){
+    // userkey = owner = usuario
+
+    let url = "http://localhost:8080/cgi-bin/list.pl?usuario="+userKey;
+    console.log(url);
+    var xhr = new XMLHttpRequest();
     
+    xhr.open("GET", url, true);
+    xhr.send();
+
+    xhr.onload = function () {
+      showList(xhr.responseXML);
+    };
 }
 
 /**
