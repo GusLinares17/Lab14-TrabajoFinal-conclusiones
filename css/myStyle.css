@@ -14,10 +14,10 @@ body {
   padding: 20px;
 }
 
-/* The navbar container */
+
 .topnav {
   overflow: hidden;
-  background-color: #007bff; /* Franja de navegación azul */
+  background-color: #007bff;
 }
 
 /* Navbar links */
@@ -30,21 +30,18 @@ body {
   text-decoration: none;
 }
 
-/* Links - change color on hover */
 .topnav p:hover {
   background-color: #0056b3; /* Azul más oscuro para el efecto hover */
   color: white;
   box-shadow: 0 0 10px 2px #0056b3; /* Brillo en azul cuando el mouse pasa */
 }
 
-/* Create two unequal columns that floats next to each other */
-/* Left column */
+
 .leftcolumn {   
   float: left;
   width: 75%;
 }
 
-/* Right column */
 .rightcolumn {
   float: left;
   width: 25%;
@@ -52,7 +49,6 @@ body {
   padding-left: 20px;
 }
 
-/* Fake image */
 .fakeimg {
   background-color: #aaa;
   width: 100%;
@@ -60,25 +56,23 @@ body {
   height:100px;
 }
 
-/* Add a card effect for articles */
+
 .card {
   background-color: white;
   padding: 20px;
   margin-top: 20px;
 }
 
-/* Clear floats after the columns */
 .row:after {
   content: "";
   display: table;
   clear: both;
 }
 
-/* Footer */
 .footer {
   padding: 20px;
   text-align: center;
-  background-color: #00bcd4; /* Franja inferior celeste */
+  background-color: #00bcd4;
   margin-top: 20px;
   overflow: hidden;
 }
@@ -87,13 +81,11 @@ body {
   float: right;
 }
 
-/* Títulos de la página */
 h1, h2 {
   font-family: "Consolas", monospace; /* Cambiar la fuente a Consolas */
   font-size: 36px; /* Aumentar el tamaño de la fuente */
 }
 
-/* Responsive layout - when the screen is less than 800px wide, make the two columns stack on top of each other instead of next to each other */
 @media screen and (max-width: 800px) {
   .leftcolumn, .rightcolumn {   
     width: 100%;
@@ -105,7 +97,6 @@ h1, h2 {
   color: green;
 }
 
-/* Responsive layout - when the screen is less than 400px wide, make the navigation links stack on top of each other instead of next to each other */
 @media screen and (max-width: 400px) {
   .topnav p {
     float: none;
