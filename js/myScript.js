@@ -121,8 +121,27 @@ function doCreateAccount(){
     const Apellido = encodeURIComponent(document.getElementById("Apellido").value).replace(/%20/g,"+");
     const usuario = document.getElementById("usuario").value;
     const password = document.getElementById("password").value;
-    
+    if (usuario == "" || password == "" || Nombre == "" || Apellido == "") {
+        document.getElementById("Nombre").value = "";
+        document.getElementById("Apellido").value = "";
+        document.getElementById("usuario").value = "";
+        document.getElementById("password").value = "";
+    }
+    else {
 
+        let url = "http://localhost:8080/cgi-bin/register.pl?usuario="+usuario+"&password="+password+"&Nombre="+Nombre+"&Apellido="+Apellido;
+        console.log(url);
+
+        var xhr = new XMLHttpRequest();
+
+        xhr.open("GET", url, true);
+        xhr.send();
+        // registramos cuenta y la logeamos automaticamente
+        xhr.onload = function () {
+            loginResponse(xhr.responseXML);
+        };
+
+    }
 }
 
 /*
