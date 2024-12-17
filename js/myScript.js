@@ -1,5 +1,5 @@
 /**
- * Esta función muestra un formulario de login (para fetch)
+ * Esta función muestra un formulario de login 
  * El botón enviar del formulario deberá invocar a la función doLogin
  * Modifica el tag div con id main en el html
  */
@@ -24,8 +24,12 @@ function showLogin(){
  * La respuesta del CGI es procesada por la función loginResponse
  */
 function doLogin(){
+
     const usuario = document.getElementById("usuario").value;
     const password = document.getElementById("password").value;
+
+    //consultamos con login.pl
+    // url a momento de conectar con perl
     let url = "http://localhost:8080/cgi-bin/login.pl?usuario="+usuario+"&password="+password;
     console.log(url);
 
@@ -33,10 +37,14 @@ function doLogin(){
 
     xhr.open("GET", url, true);
     xhr.send();
+
     xhr.onload = function () { //llamamos a loginResponse
-    loginResponse(xhr.responseXML);
+        loginResponse(xhr.responseXML);
     };
-    
+
+
+
+
 }
 /**
  * Esta función recibe una respuesta en un objeto XML
@@ -47,9 +55,13 @@ function doLogin(){
  * indicando que los datos de usuario y contraseña no coinciden.
  */
 function loginResponse(xml){
+
+    // <user><owner><firstName><lastName>
+
     const userTag = xml.children[0];
     console.log(userTag);
-if (!(userTag.textContent == "\n")) { 
+
+    if (!(userTag.textContent == "\n")) { 
         let owner = userTag.children[0].textContent;
         let firstName = userTag.children[1].textContent;
         let lastName = userTag.children[2].textContent;
@@ -65,7 +77,8 @@ if (!(userTag.textContent == "\n")) {
         document.getElementById("usuario").value = "";
         document.getElementById("password").value = "";
     }
-   
+
+
 
 }
 /**
@@ -91,6 +104,7 @@ function showLoggedIn(){
  * función doCreateAccount
  * */
 function showCreateAccount(){
+
     const mainTag = document.getElementById("main");
 
     var html = `
@@ -107,8 +121,6 @@ function showCreateAccount(){
     mainTag.innerHTML = html;
 
 
-  
-
 }
 
 /* Esta función extraerá los datos ingresados en el formulario de
@@ -116,11 +128,14 @@ function showCreateAccount(){
  * la respuesta de este CGI será procesada por loginResponse.
  */
 function doCreateAccount(){
+    
     // nombre y apellido pueden escribir letras separadas y no habra problema
     const Nombre = encodeURIComponent(document.getElementById("Nombre").value).replace(/%20/g,"+");
     const Apellido = encodeURIComponent(document.getElementById("Apellido").value).replace(/%20/g,"+");
     const usuario = document.getElementById("usuario").value;
     const password = document.getElementById("password").value;
+
+
     if (usuario == "" || password == "" || Nombre == "" || Apellido == "") {
         document.getElementById("Nombre").value = "";
         document.getElementById("Apellido").value = "";
@@ -142,6 +157,8 @@ function doCreateAccount(){
         };
 
     }
+
+
 }
 
 /*
@@ -162,6 +179,7 @@ function doList(){
     xhr.onload = function () {
       showList(xhr.responseXML);
     };
+
 }
 
 /**
@@ -174,14 +192,19 @@ function doList(){
  * indicándolo.
  */
 function showList(xml){
+
     const articlesTag = xml.children[0];
+
     if (articlesTag.children.length == 0) { // en caso este vacio.
-        document.getElementById("main").innerHTML = <h1>No hay paginas creadas</h1>;
+        document.getElementById("main").innerHTML = `<h1>No hay paginas creadas</h1>`;
     } 
+    
     else {
         document.getElementById("main").innerHTML = "<h1>Listado de paginas</h1>";
+
         for (let i = 0; i < articlesTag.children.length; i++) { // imprimimos las paginas existentes
             //<articles><article><owner><title>
+
             let title = articlesTag.children[i].children[1].textContent;
             var pagina = `<span>${title}</span>
             <button onclick="doView('${userKey}','${title}')">Ver Pagina</button>
@@ -189,8 +212,11 @@ function showList(xml){
             <button onclick="doEdit('${userKey}','${title}')">Editar Pagina</button><br>`;
             document.getElementById("main").innerHTML += pagina;
             console.log(document.getElementById("main").innerHTML);
+
         }
+
     }
+
 }
 
 /**
@@ -200,13 +226,16 @@ function showList(xml){
  * - Cancelar, que invoca doList
  */
 function showNew(){
+
     let showNew = `<p>Titulo</p>
     <input id='titulo' name ='titulo' type='text'><br>
     <p>Contenido-markdown</p>
     <textarea style = "width: 100%;" type="text" id ="cuerpo" name="cuerpo"></textarea><br>
     <button onclick='doNew()'>Enviar</button>
     <button onclick='doList()'>Cancelar</button>`;
+  
     document.getElementById("main").innerHTML = showNew;
+
 }
 
 /*
@@ -218,15 +247,21 @@ function showNew(){
 function doNew(){
     // encodeURI reemplaza espacios con %20, entonces reemplazamos %20 con + para la url
     let titulo = encodeURIComponent(document.getElementById("titulo").value).replace(/%20/g, "+"); // para reemplazar espacios en el url
+    
     let cuerpo = encodeURIComponent(document.getElementById("cuerpo").value).replace(/%20/g,"+");
+    
     let url = "http://localhost:8080/cgi-bin/new.pl?usuario="+userKey+"&titulo="+titulo+"&cuerpo="+cuerpo;
     console.log(url);
     let xhr = new XMLHttpRequest();
+      
     xhr.open("GET", url, true);
     xhr.send();
+
     xhr.onload = function () {
         responseNew(xhr.responseXML);
     };
+    
+
 }
 
 /*
@@ -235,14 +270,16 @@ function doNew(){
  * correspondiera
  */
 function responseNew(response){
-    //Muestra el nuevo articulo creado
+   
+    //<article><title><text>
     let article = response.children[0];
-    if (article.children.length == 0) { //si esta vacio
-        document.getElementById("main").innerHTML = <h2>Error al crear nueva pagina</h2>;
+    if (article.children.length == 0) { // si esta vacio
+        document.getElementById("main").innerHTML = `<h2>Error al crear nueva pagina</h2>`;
     } 
     else {
         document.getElementById("main").innerHTML = "<h2>"+article.children[0].textContent+"</h2><p>"+article.children[1].textContent+"</p>";
     }
+
 }
 
 /*
@@ -250,15 +287,17 @@ function responseNew(response){
  * atendida por responseView
  */
 function doView(owner, title) {
-    let url = http://localhost:8080/cgi-bin/view.pl?usuario=${encodeURIComponent(owner)}&titulo=${encodeURIComponent(title)};
+    let url = `http://localhost:8080/cgi-bin/view.pl?usuario=${encodeURIComponent(owner)}&titulo=${encodeURIComponent(title)}`;
+
     let xhr = new XMLHttpRequest();
     xhr.open("GET", url, true);
     xhr.send();
+
     xhr.onload = function () {
         if (!xhr.responseXML) {
             console.error("Error: La respuesta no es XML válido.");
             console.log("Respuesta recibida:", xhr.responseText);
-            document.getElementById("main").innerHTML = <h2>Error al cargar la página</h2>;
+            document.getElementById("main").innerHTML = `<h2>Error al cargar la página</h2>`;
             return;
         }
         responseView(xhr.responseXML);
@@ -271,7 +310,15 @@ function doView(owner, title) {
  * un mensaje de error en caso de algún problema.
  */
 function responseView(response) {
-   
+    let root = response.querySelector("root");
+
+    if (!root) {
+        document.getElementById("main").innerHTML = `<h2>Error al procesar la página</h2>`;
+        console.error("Respuesta XML inválida.");
+        return;
+    }
+
+    document.getElementById("main").innerHTML = root.innerHTML;
 }
 
 /*
@@ -280,7 +327,15 @@ function responseView(response) {
  */
 function doDelete(owner, title){
 
-    
+    let url = "http://localhost:8080/cgi-bin/delete.pl?usuario="+owner+"&titulo="+title;
+    let xhr = new XMLHttpRequest();
+
+    xhr.open("GET", url, true);
+    xhr.send();
+
+    xhr.onload = function () {
+        doList();
+    };
 
 }
 
@@ -290,7 +345,16 @@ function doDelete(owner, title){
  */
 function doEdit(owner, title){
 
-   
+    let url = "http://localhost:8080/cgi-bin/article.pl?usuario="+owner+"&titulo="+title;
+    console.log(url);
+    let xhr = new XMLHttpRequest();
+  
+    xhr.open("GET", url, true);
+    xhr.send();
+
+    xhr.onload = function () {
+        responseEdit(xhr.responseXML);
+    };
 
 }
 
@@ -302,6 +366,17 @@ function doEdit(owner, title){
  */
 function responseEdit(xml){
 
+  let titulo = xml.children[0].children[1].textContent; // titulo
+  let cuerpo = xml.children[0].children[2].textContent; // cuerpo-markdown
+  console.log(titulo);
+  console.log(xml.children[0]);
+  let showUpdate = `<h2>${titulo}</h2>
+  <p>Contenido-markdown</p>
+  <textarea style = "width: 100%;" type="text" id ="cuerpo" name="cuerpo">${cuerpo}</textarea><br>
+  <button onclick='doUpdate("${titulo}")'>Actualizar Pagina</button>
+  <button onclick='doList()'>Cancelar</button>`;
+
+  document.getElementById("main").innerHTML = showUpdate;
 
 }
 /*
@@ -311,6 +386,23 @@ function responseEdit(xml){
  */
 function doUpdate(title){
 
-    
+    console.log(title);
+    title = encodeURIComponent(title).replace(/%20/g, "+"); // para reemplazar espacios en el url
+    let cuerpo = encodeURIComponent(document.getElementById("cuerpo").value).replace(/%20/g,"+");
+    console.log(title);
+    let url = `http://localhost:8080/cgi-bin/update.pl?usuario=${userKey}&titulo=${title}&cuerpo=${cuerpo}`;
+
+    console.log(url);
+    let xhr = new XMLHttpRequest();
+
+    xhr.open("GET", url, true);
+    xhr.send();
+
+    xhr.onload = function () {
+        responseNew(xhr.responseXML); // para verificar si actualizo o no
+    };
+
 
 }
+
+
