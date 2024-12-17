@@ -175,19 +175,22 @@ function doList(){
  */
 function showList(xml){
     const articlesTag = xml.children[0];
-
     if (articlesTag.children.length == 0) { // en caso este vacio.
         document.getElementById("main").innerHTML = <h1>No hay paginas creadas</h1>;
     } 
-    
     else {
         document.getElementById("main").innerHTML = "<h1>Listado de paginas</h1>";
-
         for (let i = 0; i < articlesTag.children.length; i++) { // imprimimos las paginas existentes
             //<articles><article><owner><title>
-
-   
-
+            let title = articlesTag.children[i].children[1].textContent;
+            var pagina = `<span>${title}</span>
+            <button onclick="doView('${userKey}','${title}')">Ver Pagina</button>
+            <button onclick="doDelete('${userKey}','${title}')">Eliminar Pagina</button>
+            <button onclick="doEdit('${userKey}','${title}')">Editar Pagina</button><br>`;
+            document.getElementById("main").innerHTML += pagina;
+            console.log(document.getElementById("main").innerHTML);
+        }
+    }
 }
 
 /**
