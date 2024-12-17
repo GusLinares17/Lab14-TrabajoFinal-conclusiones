@@ -1,70 +1,61 @@
 #!/usr/bin/perl
 
-use strict;
-use warnings;
 use DBI;
 use CGI;
+use strict;
+use warnings;
 
-# Recibir parámetros
+# Recibimos parámetros
 my $q = CGI->new;
-my $owner    = $q->param("usuario");
-my $titulo   = $q->param("titulo");
+my $owner = $q->param("usuario");
+my $titulo = $q->param("titulo");
 my $markdown = $q->param("cuerpo");
 
-# Conexión a la base de datos
-my $db_user     = 'alumno';
-my $db_password = 'pweb1';
-my $db_dsn      = "DBI:MariaDB:database=pweb1;host=192.168.1.6";
-my $dbh         = DBI->connect($db_dsn, $db_user, $db_password, { RaiseError => 1, PrintError => 0 })
-    or die("No se pudo conectar a la base de datos: $DBI::errstr");
+# Conectamos a la base de datos
+my $user = 'root';
+my $password = 'wikipass';
+my $dsn = "DBI:MariaDB:database=my_database;host=db";
+my $dbh = DBI->connect($dsn, $user, $password) or die("No se pudo conectar!");
 
-# Verificar si el usuario existe
-my $sth_user = $dbh->prepare("SELECT * FROM Users WHERE userName = ?");
-$sth_user->execute($owner);
-my @user_row = $sth_user->fetchrow_array;
-$sth_user->finish;
+my $sth = $dbh->prepare("SELECT * FROM Users WHERE userName=?");
+$sth->execute($owner);
+my @row = $sth->fetchrow_array;
 
-# Respuesta XML
 print $q->header('text/XML');
 print "<?xml version='1.0' encoding='utf-8'?>\n";
 
-if (@user_row) {
-    # Si el usuario existe, verificar títulos existentes
-    my $sth_titles = $dbh->prepare("SELECT title FROM Articles WHERE owner = ?");
-    $sth_titles->execute($owner);
+if (!(@row == 0)) {
+    # Si existe un usuario con el nombre dado...
+    my @titulos;
+    my $sth = $dbh->prepare("SELECT title FROM Articles WHERE owner=?");
+    $sth->execute($owner);
 
-    my $title_exists = 0;
-    while (my @row = $sth_titles->fetchrow_array) {
-        if ($row[0] eq $titulo) {
-            $title_exists = 1;
-            last;
-        }
-    }
-    $sth_titles->finish;
-
-    if ($title_exists) {
-        # Si el título existe, actualizar el contenido
-        my $sth_update = $dbh->prepare("UPDATE Articles SET markdown = ? WHERE title = ? AND owner = ?");
-        $sth_update->execute($markdown, $titulo, $owner);
-        $sth_update->finish;
-    } else {
-        # Si el título no existe, insertar nuevo artículo
-        my $sth_insert = $dbh->prepare("INSERT INTO Articles (title, owner, markdown) VALUES (?, ?, ?)");
-        $sth_insert->execute($titulo, $owner, $markdown);
-        $sth_insert->finish;
+    while (my @row2 = $sth->fetchrow_array) {
+        push(@titulos, @row2);
     }
 
-    print "<article>\n";
-    print "  <title>$titulo</title>\n";
-    print "  <text>$markdown</text>\n";
-    print "</article>\n";
-} else {
-    # Si el usuario no existe
-    print "<article>\n";
-    print "  <title></title>\n";
-    print "  <text></text>\n";
-    print "</article>\n";
+    if (@titulos && $titulos[0] eq $titulo) {
+        my $sth1 = $dbh->prepare("UPDATE Articles SET markdown=? WHERE title=? AND owner=?");
+        $sth1->execute($markdown, $titulo, $owner);
+        $sth1->finish;
+    }
+    else {
+        my $sth2 = $dbh->prepare("INSERT INTO Articles (title, owner, markdown) VALUES (?, ?, ?)");
+        $sth2->execute($titulo, $owner, $markdown);
+        $sth2->finish;
+    }
+    $sth->finish;
+
+    print "<article>";
+    print "<title>$titulo</title>";
+    print "<text>$markdown</text>";
+    print "</article>";
+}
+else {
+    print "<article>";
+    print "<title></title>";
+    print "<text></text>";
+    print "</article>";
 }
 
-# Desconectar de la base de datos
 $dbh->disconnect;

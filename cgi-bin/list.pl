@@ -1,42 +1,34 @@
 #!/usr/bin/perl
 
-use strict;
-use warnings;
 use DBI;
 use CGI;
+use strict;
+use warnings;
 
-# Crear objeto CGI para manejar parámetros
+# Recibimos parámetros
 my $q = CGI->new;
 my $owner = $q->param("usuario");
 
-# Configuración de conexión a la base de datos
-my $db_user = 'alumno';
-my $db_password = 'pweb1';
-my $db_dsn = "DBI:MariaDB:database=pweb1;host=192.168.1.6";
+my $user = 'root';
+my $password = 'wikipass';
+my $dsn = "DBI:MariaDB:database=my_database;host=db";
+my $dbh = DBI->connect($dsn, $user, $password) or die("No se pudo conectar!");
 
-# Conectar a la base de datos
-my $dbh = DBI->connect($db_dsn, $db_user, $db_password, { RaiseError => 1, PrintError => 0 })
-    or die("No se pudo conectar a la base de datos: $DBI::errstr");
-
-# Preparar y ejecutar la consulta para obtener los títulos de las páginas del propietario
-my $sth = $dbh->prepare("SELECT title FROM Articles WHERE owner = ?");
-$sth->execute($owner);
-
-# Generar respuesta XML
 print $q->header('text/XML');
 print "<?xml version='1.0' encoding='utf-8'?>\n";
-print "<articles>\n";
 
-# Recorrer y mostrar los resultados
+# Listado de páginas
+my $sth = $dbh->prepare("SELECT title FROM Articles WHERE owner=?");
+$sth->execute($owner);
+
+print "<articles>\n";
 while (my @row = $sth->fetchrow_array) {
     print "<article>\n";
-    print "<owner>$owner</owner>";
-    print "<title>$row[0]</title>";  # Acceder al primer elemento de la fila
+    print "<owner>$owner</owner>\n";
+    print "<title>@row</title>\n";
     print "</article>\n";
 }
-
 print "</articles>\n";
 
-# Limpiar recursos y cerrar la conexión
 $sth->finish;
 $dbh->disconnect;

@@ -1,94 +1,82 @@
 #!/usr/bin/perl
 
-use strict;
-use warnings;
 use DBI;
 use CGI;
+use strict;
+use warnings;
 
-# Crear instancia CGI y obtener parámetros
-my $q      = CGI->new;
-my $owner  = $q->param('usuario');
+# Crear el objeto CGI para recibir parámetros
+my $q = CGI->new;
+my $owner = $q->param('usuario');
 my $titulo = $q->param('titulo');
 
 # Conexión a la base de datos
-my $db_user     = 'alumno';
-my $db_password = 'pweb1';
-my $db_dsn      = "DBI:MariaDB:database=pweb1;host=192.168.1.6";
-my $dbh         = DBI->connect($db_dsn, $db_user, $db_password, { RaiseError => 1, PrintError => 0 })
-    or die("No se pudo conectar a la base de datos: $DBI::errstr");
+my $user = 'root';
+my $password = 'wikipass';
+my $dsn = "DBI:MariaDB:database=my_database;host=db";
+my $dbh = DBI->connect($dsn, $user, $password) or die("No se pudo conectar!");
 
-# Consultar contenido en markdown
+# Consultar el contenido en Markdown de la base de datos
 my $sth = $dbh->prepare("SELECT markdown FROM Articles WHERE owner = ? AND title = ?");
 $sth->execute($owner, $titulo);
 
-# Extraer resultados
-my @markdown_content;
-while (my @row = $sth->fetchrow_array) {
-    push(@markdown_content, @row);
-}
-
+my @texto = $sth->fetchrow_array;
 $sth->finish;
-$dbh->disconnect;
 
-# Procesar markdown
-my @lineas = split("\n", $markdown_content[0] // '');
-my $textoHTML = '';
-
-foreach my $linea (@lineas) {
-    my $lineaHTML = matchLine($linea);
-    $textoHTML .= $lineaHTML;
+# Validar si se encontró el artículo
+if (!@texto) {
+    print $q->header('text/XML');
+    print "<?xml version='1.0' encoding='utf-8'?>\n";
+    print "<root><error>No se encontró la página</error></root>\n";
+    $dbh->disconnect;
+    exit;
 }
 
-# Generar respuesta en XML
+# Dividir el contenido Markdown en líneas
+my @lineas = split "\n", $texto[0];
+my $textoHTML = "";
+
+# Convertir cada línea de Markdown a HTML
+foreach my $linea (@lineas) {
+    $textoHTML .= matchLine($linea);
+}
+
+# Generar la salida en XML
 print $q->header('text/XML');
 print "<?xml version='1.0' encoding='utf-8'?>\n";
 print "<root>\n";
-print $textoHTML;
+print "$textoHTML";
 print "</root>\n";
 
-# Subrutina para procesar cada línea de markdown
+# Cerrar la conexión a la base de datos
+$dbh->disconnect;
+
+# Función para convertir líneas Markdown a HTML
 sub matchLine {
-    my $linea = shift;
+    my ($linea) = @_;
 
-    # Si la línea no está vacía, procesarla
-    if ($linea !~ /^\s*$/) {
+    # Ignorar líneas vacías
+    return "" if $linea =~ /^\s*$/;
 
-        # Reemplazos para markdown -> HTML
-        while ($linea =~ /(.*)(\*\*\*)(.*?)(\*\*\*)(.*)/) {
-            $linea = "$1<strong><em>$3</em></strong>$5";
-        }
-        while ($linea =~ /(.*)(\*\*)(.*?)(\*\*)(.*)/) {
-            $linea = "$1<strong>$3</strong>$5";
-        }
-        while ($linea =~ /(.*)(\*)(.*?)(\*)(.*)/) {
-            $linea = "$1<em>$3</em>$5";
-        }
-        while ($linea =~ /(.*)(\_)(.*?)(\_)(.*)/) {
-            $linea = "$1<em>$3</em>$5";
-        }
-        while ($linea =~ /(.*)(\[)(.*?)(\])(\()(.*?)(\))(.*)/) {
-            $linea = "$1<a href='$6'>$3</a>$8";
-        }
-        while ($linea =~ /(.*)(\~\~)(.*?)(\~\~)(.*)/) {
-            $linea = "$1<del>$3</del>$5";
-        }
+    # Negritas y cursivas
+    $linea =~ s/\*\*\*(.*?)\*\*\*/<strong><em>$1<\/em><\/strong>/g;
+    $linea =~ s/\*\*(.*?)\*\*/<strong>$1<\/strong>/g;
+    $linea =~ s/\*(.*?)\*/<em>$1<\/em>/g;
 
-        # Reemplazo de encabezados
-        if ($linea =~ /^\#{6}\s+(.*)/) {
-            return "<h6>$1</h6>\n";
-        } elsif ($linea =~ /^\#{5}\s+(.*)/) {
-            return "<h5>$1</h5>\n";
-        } elsif ($linea =~ /^\#{4}\s+(.*)/) {
-            return "<h4>$1</h4>\n";
-        } elsif ($linea =~ /^\#{3}\s+(.*)/) {
-            return "<h3>$1</h3>\n";
-        } elsif ($linea =~ /^\#{2}\s+(.*)/) {
-            return "<h2>$1</h2>\n";
-        } elsif ($linea =~ /^\#\s+(.*)/) {
-            return "<h1>$1</h1>\n";
-        } else {
-            return "<p>$linea</p>\n";
-        }
+    # Subrayado y tachado
+    $linea =~ s/\_\_(.*?)\_\_/<strong>$1<\/strong>/g;
+    $linea =~ s/\_(.*?)\_/<em>$1<\/em>/g;
+    $linea =~ s/\~\~(.*?)\~\~/<del>$1<\/del>/g;
+
+    # Links
+    $linea =~ s/\[(.*?)\]\((.*?)\)/<a href="$2">$1<\/a>/g;
+
+    # Encabezados
+    if ($linea =~ /^(#{1,6})\s*(.+)$/) {
+        my $level = length($1);
+        return "<h$level>$2<\/h$level>\n";
     }
-    return "";
+
+    # Texto normal
+    return "<p>$linea<\/p>\n";
 }

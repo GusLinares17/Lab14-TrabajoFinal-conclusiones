@@ -1,56 +1,48 @@
 #!/usr/bin/perl
 
-use strict;
-use warnings;
 use DBI;
 use CGI;
+use strict;
+use warnings;
 
-# Crear instancia CGI y obtener parámetros
 my $q = CGI->new;
-my $nombres       = $q->param('Nombre');
-my $apellidos     = $q->param('Apellido');
+my $nombres = $q->param('Nombre');
+my $apellidos = $q->param('Apellido');
 my $nombreUsuario = $q->param('usuario');
-my $contra        = $q->param('password');
+my $contra = $q->param('password');
 
-# Conexión a la base de datos
-my $db_user     = 'alumno';
-my $db_password = 'pweb1';
-my $db_dsn      = "DBI:MariaDB:database=pweb1;host=192.168.1.6";
-my $dbh         = DBI->connect($db_dsn, $db_user, $db_password, { RaiseError => 1, PrintError => 0 })
-    or die("No se pudo conectar a la base de datos: $DBI::errstr");
+# Conectamos con la base de datos
+my $user = 'root';
+my $password = 'wikipass';
+my $dsn = "DBI:MariaDB:database=my_database;host=db";
+my $dbh = DBI->connect($dsn, $user, $password) or die("No se pudo conectar!");
+my $sth = $dbh->prepare("SELECT * FROM Users WHERE userName=?");
 
-# Verificar si el usuario ya existe
-my $sth_check = $dbh->prepare("SELECT * FROM Users WHERE userName = ?");
-$sth_check->execute($nombreUsuario);
-my @user_row = $sth_check->fetchrow_array;
-$sth_check->finish;
+$sth->execute($nombreUsuario);
+my @row = $sth->fetchrow_array;
+$sth->finish;
 
-# Respuesta en XML
-print $q->header('text/XML');
+print $q->header('text/xml');
 print "<?xml version='1.0' encoding='utf-8'?>\n";
 
-if (!@user_row) {
-    # Si el usuario no existe, agregarlo a la base de datos
-    my $sth_insert = $dbh->prepare(
-        "INSERT INTO Users (userName, password, lastName, firstName) VALUES (?, ?, ?, ?)"
-    );
+if (@row == 0) {
+    # Si no existe el usuario en la base de datos...
+    my $sth_insert = $dbh->prepare("INSERT INTO Users(userName, password, lastName, firstName) VALUES (?, ?, ?, ?)");
     $sth_insert->execute($nombreUsuario, $contra, $apellidos, $nombres);
     $sth_insert->finish;
 
-    # Generar respuesta XML para usuario agregado
     print "<user>\n";
-    print "  <owner>$nombreUsuario</owner>\n";
-    print "  <firstName>$nombres</firstName>\n";
-    print "  <lastName>$apellidos</lastName>\n";
+    print "<owner>$nombreUsuario</owner>\n";
+    print "<firstName>$nombres</firstName>\n";
+    print "<lastName>$apellidos</lastName>\n";
     print "</user>\n";
-} else {
-    # Generar respuesta XML para usuario ya existente
+}
+else {
     print "<user>\n";
-    print "  <owner></owner>\n";
-    print "  <firstName></firstName>\n";
-    print "  <lastName></lastName>\n";
+    print "<owner> </owner>\n";
+    print "<firstName> </firstName>\n";
+    print "<lastName> </lastName>\n";
     print "</user>\n";
 }
 
-# Desconectar de la base de datos
 $dbh->disconnect;
