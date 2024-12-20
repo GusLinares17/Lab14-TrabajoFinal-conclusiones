@@ -1,105 +1,206 @@
+/* General Box-Sizing */
 * {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
+/* Body Styling */
 body {
-  font-family: Arial;
+  font-family: Arial, sans-serif;
   padding: 10px;
-  background: #f1f1f1;
+  background: linear-gradient(to right, #f1f1f1, #e8e8e8);
+  color: #333;
+  line-height: 1.6;
 }
 
+/* Header Styling */
 .header {
-  background-color: white;
+  background-color: #fff;
   text-align: center;
   padding: 20px;
+  border-bottom: 2px solid #f1f1f1;
 }
 
+/* Heading Fonts */
+h1, h2 {
+  font-family: "Courier New", Courier, monospace;
+}
 
+/* Navbar Container */
 .topnav {
   overflow: hidden;
-  background-color: #007bff;
+  background: linear-gradient(90deg, #333, #555);
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  padding: 10px 0;
+  border-radius: 10px;
 }
 
-/* Navbar links */
+/* Navbar Links */
 .topnav p {
-  float: left;
-  display: block;
   color: #f2f2f2;
   text-align: center;
-  padding: 14px 16px;
+  padding: 10px 15px;
   text-decoration: none;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
 }
 
+/* Navbar Hover Effect */
 .topnav p:hover {
-  background-color: #0056b3; /* Azul más oscuro para el efecto hover */
-  color: white;
-  box-shadow: 0 0 10px 2px #0056b3; /* Brillo en azul cuando el mouse pasa */
+  background-color: #ddd;
+  color: #333;
+  border-radius: 5px;
 }
 
-
-.leftcolumn {   
-  float: left;
-  width: 75%;
+/* Navbar Icons */
+.topnav p i {
+  margin-right: 8px;
 }
 
+/* Layout Styling: Columns */
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+/* Left Column */
+.leftcolumn {
+  flex: 3;
+  padding-right: 15px;
+}
+
+/* Right Column */
 .rightcolumn {
-  float: left;
-  width: 25%;
+  flex: 1;
   background-color: #f1f1f1;
-  padding-left: 20px;
+  padding: 15px;
+  border-radius: 5px;
 }
 
+/* Fake Image Placeholder */
 .fakeimg {
-  background-color: #aaa;
+  background-color: #ccc;
   width: 100%;
   padding: 20px;
-  height:100px;
+  height: 100px;
+  text-align: center;
+  color: #555;
+  font-size: 14px;
+  line-height: 100px;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-
+/* Card Styling */
 .card {
   background-color: white;
   padding: 20px;
   margin-top: 20px;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
 }
 
-.row:after {
-  content: "";
-  display: table;
-  clear: both;
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
-.footer {
-  padding: 20px;
+/* Scroll-to-Top Button */
+.scroll-to-top {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #333;
+  color: #fff;
+  padding: 10px 15px;
+  border-radius: 50%;
+  text-decoration: none;
   text-align: center;
-  background-color: #00bcd4;
-  margin-top: 20px;
-  overflow: hidden;
+  font-size: 18px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s, transform 0.3s;
 }
 
-.rightAlign{
-  float: right;
+.scroll-to-top:hover {
+  background-color: #555;
+  transform: scale(1.1);
 }
 
-h1, h2 {
-  font-family: "Consolas", monospace; /* Cambiar la fuente a Consolas */
-  font-size: 36px; /* Aumentar el tamaño de la fuente */
-}
-
-@media screen and (max-width: 800px) {
-  .leftcolumn, .rightcolumn {   
-    width: 100%;
+/* Responsive Design */
+@media (max-width: 768px) {
+  .leftcolumn, .rightcolumn {
+    flex: 100%;
     padding: 0;
+    margin-bottom: 20px;
   }
-}
-
-.owner{
-  color: green;
-}
-
-@media screen and (max-width: 400px) {
+  .topnav {
+    flex-direction: column;
+    align-items: center;
+  }
   .topnav p {
-    float: none;
     width: 100%;
+    text-align: center;
   }
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Button Styling */
+.button {
+  background-color: #333;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.button:hover {
+  background-color: #555;
+  transform: scale(1.05);
+}
+
+/* Dark Mode */
+body.dark-mode {
+  background: #222;
+  color: #fff;
+}
+
+body.dark-mode .header {
+  background-color: #333;
+  color: #fff;
+}
+
+body.dark-mode .topnav {
+  background-color: #444;
+}
+
+body.dark-mode .card {
+  background-color: #333;
+  color: #fff;
+  box-shadow: 0 2px 5px rgba(255, 255, 255, 0.1);
 }
